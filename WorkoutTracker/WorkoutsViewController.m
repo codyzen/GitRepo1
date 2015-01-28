@@ -21,17 +21,11 @@
 
 @implementation WorkoutsViewController
 
-//reference service
-WorkoutSvcCache *workoutSvc2 = nil;
-
 - (void)viewDidLoad {
     [super viewDidLoad];
     NSLog(@"WktsVwCtrl::viewDidLoad -- Entering...");
     // Do any additional setup after loading the view from its nib.
     //self.view.backgroundColor = [UIColor redColor];
-    
-    //initialize service
-    workoutSvc2 = [[WorkoutSvcCache alloc] init];
     
     //setting up dataSource and delegate
     self.tableView.dataSource = self;
@@ -57,10 +51,10 @@ WorkoutSvcCache *workoutSvc2 = nil;
     workout.name = @"Hot Fusion Yoga";
     workout.location = @"CorePower Yoga";
     workout.category = @"Yoga/Pilates";
-    Workout *firstWkt = [workoutSvc2 createWorkout:workout];
+    Workout *firstWkt = [[WorkoutSvcCache sharedInstance] createWorkout:workout];
     NSLog([NSString stringWithFormat:@"First Workout: #%@", firstWkt.name]);
     NSLog(@"First Workout created!!!");
-    NSLog([NSString stringWithFormat:@"retriveAllWorkouts: %lu", (unsigned long)[[workoutSvc2 retrieveAllWorkouts] count]]);
+    NSLog([NSString stringWithFormat:@"retriveAllWorkouts: %lu", (unsigned long)[[[WorkoutSvcCache sharedInstance] retrieveAllWorkouts] count]]);
     
     NSLog(@"WktsVwCtrl::viewDidLoad -- Exiting...");
 
@@ -80,18 +74,26 @@ WorkoutSvcCache *workoutSvc2 = nil;
     NSLog(@"WktsVwCtrl::viewWillAppear -- Exiting...");
 }
 
+- (void)viewDidAppear:(BOOL)animated{
+    [super viewDidAppear:animated];
+    //reloading, which calls cellForRowAtIndexPath
+    [self.tableView reloadData];
+}
+
 #pragma mark - UITableViewDataSource
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section {
     
     NSLog(@"WktsVwCtrl::numberOfRowsInSection -- Entering...");
     
-    NSLog([NSString stringWithFormat:@"retrieveAllWorkouts count = %lu", (unsigned long)[[workoutSvc2 retrieveAllWorkouts] count]]);
+    NSLog([NSString stringWithFormat:@"retrieveAllWorkouts count = %lu", (unsigned long)[[[WorkoutSvcCache sharedInstance] retrieveAllWorkouts] count]]);
     //return self.workouts.count;
     
     NSLog(@"WktsVwCtrl::numberOfRowsInSection -- Exiting...");
-    return [[workoutSvc2 retrieveAllWorkouts] count];
+    return [[[WorkoutSvcCache sharedInstance] retrieveAllWorkouts] count];
 }
 
+
+//only called when new cells scroll onto the screen, or if table hasn't been displayed before, or if you call reload (tableView.reload?)
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     
     NSLog(@"WktsVwCtrl::cellForRowAtIndexPath -- Entering...");
@@ -102,7 +104,7 @@ WorkoutSvcCache *workoutSvc2 = nil;
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:cellId];
     }
     
-    Workout *workout = [[workoutSvc2 retrieveAllWorkouts]objectAtIndex:indexPath.row];
+    Workout *workout = [[[WorkoutSvcCache sharedInstance] retrieveAllWorkouts]objectAtIndex:indexPath.row];
     cell.textLabel.text = workout.name;
     
     
@@ -125,9 +127,10 @@ WorkoutSvcCache *workoutSvc2 = nil;
     
     //Workout *workout = [self.workouts objectAtIndex:indexPath.row];
     
-    Workout *workout = [[workoutSvc2 retrieveAllWorkouts]objectAtIndex:indexPath.row];
+    Workout *workout = [[[WorkoutSvcCache sharedInstance] retrieveAllWorkouts]objectAtIndex:indexPath.row];
     
     WorkoutDetailsViewController *workoutDetailsCtrl = [[WorkoutDetailsViewController alloc] init];
+    // Pass workout selected from table view controller to detail controller
     workoutDetailsCtrl.workout = workout;
     [self.navigationController pushViewController:workoutDetailsCtrl animated:true];
     

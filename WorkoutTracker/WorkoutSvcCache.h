@@ -12,4 +12,10 @@
 //add protocol WorkoutSvc
 @interface WorkoutSvcCache : NSObject <WorkoutSvc>
 
+// Member variables must be declared in interface
+@property (nonatomic) NSMutableArray *workouts;
+
+// Method declaration
++ (WorkoutSvcCache *)sharedInstance;
+
 @end

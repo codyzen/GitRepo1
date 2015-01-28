@@ -11,21 +11,11 @@
 #import "WorkoutSvc.h"
 #import "WorkoutSvcCache.h"
 
-@interface WorkoutDetailsViewController ()
-
-@end
-
 @implementation WorkoutDetailsViewController
-
-//reference service
-WorkoutSvcCache *workoutSvc = nil;
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view from its nib.
-    
-    //initialize service
-    workoutSvc = [[WorkoutSvcCache alloc] init];
     
     //set label to Workout name
     self.wktNameLbl.text = @"Workout Name";
@@ -62,11 +52,11 @@ WorkoutSvcCache *workoutSvc = nil;
     NSLog(@"WktDtlController::wktSaveBtn -- Entering...");
     //dismiss keyboard
     [self.view endEditing:YES];
-    Workout *workout = [[Workout alloc] init];
-    workout.name = self.wktNameTxt.text;
-    workout.location = self.wktLocationTxt.text;
-    workout.category = self.wktCategoryTxt.text;
-    [workoutSvc createWorkout:workout];
+    Workout *workoutNew = [[Workout alloc] init];
+    workoutNew.name = self.wktNameTxt.text;
+    workoutNew.location = self.wktLocationTxt.text;
+    workoutNew.category = self.wktCategoryTxt.text;
+    [[WorkoutSvcCache sharedInstance] createWorkout:workoutNew];
     NSLog(@"WktDtlController::wktSaveBtn -- Exiting...");
 }
 
